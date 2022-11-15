@@ -6,12 +6,7 @@ const Author=async function(req,res){
     try{
     const AuthorData=req.body
     const FinalData= await AutherSchema.create(AuthorData)
-    if(!FinalData){
-        res.status(404).send({status:false,msg:"NO DATA FOUND"})
-    }else{
-        res.status(201).send({status:true,mass:FinalData})
-
-    }
+  res.send({msg:FinalData})
 }
 catch(err){
     res.status(500).send({status:false,mass:"NOT Found"})

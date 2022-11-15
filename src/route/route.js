@@ -6,11 +6,15 @@ const Blogs=require("../controller/Blogs-Controller")
 
 
 
-
 router.post("/authors",Author.Author)
-router.post("/Blogs-Data",Blogs.BlogsData)
-router.get("/Blogs",Blogs.Blogs)
-router.get("/Blogs-params/:authorId",Blogs.blogparams)
+router.post("/Blogs-Data",Blogs.createBlog)
+router.get("/blogs",Blogs.FinalData)
+
+///////=============
+router.put("/update-Data/:blogId",Blogs.putBlog)
+router.delete("/delete/:BlogId",Blogs.blogdelete)
+router.delete("/delete-data",Blogs.blogByQuery)
+
 
 
 
