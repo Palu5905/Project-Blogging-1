@@ -1,23 +1,26 @@
-const express=require("express")
-const router=express.Router()
+const express = require("express")
+const router = express.Router()
+const Authors = require("../controller/Author-Controller")
+const Blogs = require("../controller/Blogs-Controller")
+const Mymiddleware = require("../middleware/middleware")
 
-const Author=require("../controller/Author-Controller")
-const Blogs=require("../controller/Blogs-Controller")
+///>>>>>>>>> DAY FIRST API <<<<<<<<<=================
+router.post("/authors", Authors.Author)
+router.post("/Blogs", Mymiddleware.MiddleWare, Blogs.createBlog)
+router.get("/blogs", Mymiddleware.MiddleWare, Blogs.FinalData)
+
+////>>>>>>>>>>> DAY 2nd API  <<<<<<<<<<===================
+
+router.put("/update-Data/:blogId", Mymiddleware.MiddleWare, Blogs.putBlog)
+router.delete("/delete/:BlogId", Mymiddleware.MiddleWare, Blogs.blogdelete)
+router.delete("/delete-data", Mymiddleware.MiddleWare, Blogs.blogByQuery)
+
+//////========== DAY 3rd API  <<<<<<<<<<<<<========================
+
+router.post("/login-User", Blogs.loginData)
 
 
 
-router.post("/authors",Author.Author)
-router.post("/Blogs-Data",Blogs.createBlog)
-router.get("/blogs",Blogs.FinalData)
-
-///////=============
-router.put("/update-Data/:blogId",Blogs.putBlog)
-router.delete("/delete/:BlogId",Blogs.blogdelete)
-router.delete("/delete-data",Blogs.blogByQuery)
 
 
-
-
-
-
-module.exports=router;
+module.exports = router;
