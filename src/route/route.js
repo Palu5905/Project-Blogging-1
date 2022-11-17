@@ -6,21 +6,20 @@ const Mymiddleware = require("../middleware/middleware")
 
 ///>>>>>>>>> DAY FIRST API <<<<<<<<<=================
 router.post("/authors", Authors.Author)
-router.post("/Blogs", Mymiddleware.MiddleWare, Blogs.createBlog)
-router.get("/blogs", Mymiddleware.MiddleWare, Blogs.FinalData)
+router.post("/blogs" , Blogs.createBlog)
+router.get("/blogs", Mymiddleware.Authorization , Blogs.FinalData)
 
 ////>>>>>>>>>>> DAY 2nd API  <<<<<<<<<<===================
 
-router.put("/update-Data/:blogId", Mymiddleware.MiddleWare, Blogs.putBlog)
-router.delete("/delete/:BlogId", Mymiddleware.MiddleWare, Blogs.blogdelete)
-router.delete("/delete-data", Mymiddleware.MiddleWare, Blogs.blogByQuery)
+router.put("/blogs/:blogid", Mymiddleware.Authorization , Blogs.putBlog)
+router.delete("/blogs/:blogid", Mymiddleware.Authorization , Blogs.blogdelete)
+router.delete("/blogs", Mymiddleware.Authorization , Blogs.blogByQuery)
 
 //////========== DAY 3rd API  <<<<<<<<<<<<<========================
 
-router.post("/login-User", Blogs.loginData)
+router.post("/login", Authors.loginData)
 
-
-
+router.post('/create',Authors.anjali)
 
 
 module.exports = router;

@@ -1,42 +1,43 @@
+
+//------------Import or Require Modules------------//
+
 const BlogsSchema = require("../model/Blogs-Model")
 const AutherSchema = require("../model/Author-Model")
 const jwt = require('jsonwebtoken')
-const mongoose=require('mongoose')
+const mongoose = require('mongoose')
+const objectId = mongoose.Types.ObjectId
 
-const objectId=mongoose.Types.ObjectId
+//--------------post api : Create Blog--------------//
 
 const createBlog = async function (req, res) {
-
   try {
     let blogData = req.body
-
-
     let authorId = req.body.authorId
-    if(!objectId.isValid(authorId)){
-      return res.status(400).send({ msg: "Please Enter valid Author ID" })
-  }
-   let checkId = await AutherSchema.findById(authorId)
+    if (!objectId.isValid(authorId)) {
+      return res.status(400).send({ status: false, msg: "Please Enter valid Author ID" })
+    }
+    let checkId = await AutherSchema.findById(authorId)
 
     if (!checkId) {
-      return res.status(404).send({ msg: "no author found with given Id"})
+      return res.status(404).send({ status: false, msg: "no author found with given Id" })
     }
     let savedBlog = await BlogsSchema.create(blogData)
-    res.status(201).send({status:true, message: savedBlog })
+    res.status(201).send({ status: true, message: savedBlog })
   }
   catch (err) {
     res.status(500).send(err)
   }
 }
 
+//----------------get api : get Blog -----------------//
 
-
-const FinalData = async function (req, res) {
+const FinalData = async function (req, res) 
+  {
   try {
-    let categoryParams = req.query.category
-    let blogsInfo = await BlogsSchema.findOne({ category: categoryParams });
+    let blogsInfo = await BlogsSchema.find({$and:[{isdeleted:false,isPublished:true},req.query] });
 
-    if (!blogsInfo) {
-      return res.status(404).send({status:false, msg: "No data matched !" })
+    if (blogsInfo.length==0) {
+      return res.status(404).send({ status: false, msg: "No data matched !" })
     }
     res.send({ filtered_Blogs: blogsInfo })
 
@@ -47,17 +48,17 @@ const FinalData = async function (req, res) {
 }
 
 
+//----------------PUT api : Update Blog----------// 
 
 
 const putBlog = async function (req, res) {
   try {
     let data = req.body;
-    let id = req.params.blogId;
+    let id = req.params.blogid;
 
     if (!id) {
       return res.status(400).send({ status: false, msg: " Please Enter blogId Id On params ", });
     }
-
     if (!data.subcategory) {
       return res.status(400).send({ status: false, msg: "Subcategory is Required, Please Enter ", });
     }
@@ -71,7 +72,7 @@ const putBlog = async function (req, res) {
     let updatedBlog = await BlogsSchema.findOneAndUpdate(
       { _id: id },
       {
-        $set: { subcategory: data.subcategory, publishedAt:new Date(Date.now())}
+        $push: {  subcategory: data.subcategory },
       },
       { new: true, upsert: true }
     );
@@ -85,19 +86,18 @@ const putBlog = async function (req, res) {
 };
 
 
-
-
+//--------------Delete api : Delete Blog------------// 
 
 const blogdelete = async (req, res) => {
   try {
 
-    let blogId = req.params.BlogId
+    let blogId = req.params.Blogid
     let findId = await BlogsSchema.findById(blogId)
-    if (!findId || findId.isdeleted == false) {
-      return res.status(400).send({ status: true, msg: "No Blogs Present" })
+    if (!findId || !findId.isdeleted == true) {
+      return res.status(400).send({ status: false, msg: "No Blogs Present" })
     }
     let deleteblog = await BlogsSchema.findOneAndUpdate({ _id: blogId }, { $set: { isdeleted: true }, deletedAt: Date.now() })
-    return res.status(200).send({ data: deleteblog, msg: "blog deleted successfully" })
+    return res.status(200).send({ status:true, data: deleteblog, msg: "blog deleted successfully" })
   }
   catch (error) {
     return res.status(500).send(error)
@@ -105,7 +105,7 @@ const blogdelete = async (req, res) => {
   }
 }
 
-
+//-------------Delete api : Delete Blog by Query-----------------//
 
 const blogByQuery = async (req, res) => {
   try {
@@ -138,30 +138,6 @@ const blogByQuery = async (req, res) => {
 
 
 
-
-const loginData = async function (req, res) {
-  try {
-    let { emailId, pass } = req.body
-
-    let userInfo = await AutherSchema.findOne({ email: emailId, password: pass });
-    if (!userInfo)
-      return res.status(400).send({ Status: false, massage: "Plase Enter Valid UserName And Password" })
-
-    let userToken = jwt.sign({
-      UserId: userInfo._id.toString()
-    },
-      'Blog-Project'
-    )
-    res.status(200).send({ Msg: " Your JWT Token is successful generated", Status: true, MyToken: userToken })
-  }
-  catch (err) {
-    res.status(500).send({ status: false, errer: err })
-  }
-}
-
-
-
-
-module.exports={createBlog,FinalData,putBlog,blogdelete,blogByQuery,loginData}
+module.exports = { createBlog, FinalData, putBlog, blogdelete, blogByQuery }
 
 
